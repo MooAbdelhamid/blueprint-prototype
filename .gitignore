@@ -1,0 +1,7 @@
+documents
+venv
+*.csv
+data
+.vscode
+__pycache__
+venv
