@@ -1,5 +1,6 @@
 """
 Construction
+
 """
 
 import psycopg2
