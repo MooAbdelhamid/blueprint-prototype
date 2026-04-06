@@ -28,7 +28,7 @@ class DatabaseConfig:
     PORT = int(os.getenv("DB_PORT", 5432))
 
     USER = os.getenv("DB_USER", "postgres")
-    PASSWORD = os.getenv("DB_PASSWORD", "123Mm123")
+    PASSWORD = os.getenv("DB_PASSWORD", "No")
 
     CENTRAL_DB = "blueprint_central"
 
