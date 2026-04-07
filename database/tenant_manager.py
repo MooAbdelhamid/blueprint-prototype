@@ -2,6 +2,8 @@
 Construction
 """
 
+import uuid
+
 import psycopg2
 from config import DatabaseConfig
 from psycopg2 import sql
@@ -21,7 +23,7 @@ class TenantDatabaseManager:
 
         self._ensure_central_database()
 
-        self._init_central_database()
+        self._init_central_tables()
 
         print("Tenant database initialized")
 
@@ -73,7 +75,7 @@ class TenantDatabaseManager:
             cursor.close()
             conn.close()
 
-    def _init_central_database(self):
+    def _init_central_tables(self):
         """
         Create tables in central database
         """
@@ -81,9 +83,41 @@ class TenantDatabaseManager:
         cursor = conn.cursor()
 
         try:
-            pass
-        except Exception:
-            pass
+            # Table 1: tenants
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS tenants(
+                           tenant_id UUID PRIMARY KEY,
+                           company_name VARCHAR(255) NOT NULL,
+                           email VARCHAR(255) UNIQUE NOT NULL,
+                           plan VARCHAR(255) DEFAULT 'free',
+                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
+                            """)
+            # Table 2: tenants_databases
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS tenants_databases(
+                           database_id UUID PRIMARY KEY,
+                           tenant_id UUID NOT NULL,
+                           database_name VARCHAR(100),
+                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                           FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id));
+                            """)
+            # Table 3: users
+            cursor.execute("""
+                CREATE TABLE IF NOT EXISTS users(
+                           user_id UUID PRIMARY KEY,
+                           tenant_id UUID NOT NULL,
+                           email VARCHAR(255),
+                           password_hash VARCHAR(255) NOT NULL,
+                           role VARCHAR(50) DEFAULT 'user',
+                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                           FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id));
+                            """)
+            conn.commit()
+            print("Central database tables created!")
+        except Exception as e:
+            conn.rollback()
+            print(f"Error creating central tables: {e}")
+            raise
         finally:
             cursor.close()
             conn.close()
@@ -94,3 +128,41 @@ class TenantDatabaseManager:
         """
         conn_params = self.config.get_connection_string(self.config.CENTRAL_DB)
         return psycopg2.connect(**conn_params)
+
+    def create_tenant(self, company_name, email):
+        """
+        Construction
+        """
+        tenant_id = str(uuid.uuid4())
+        database_id = str(uuid.uuid4())
+        database_name = f"customer_{company_name}"
+
+        print(f"Creating customer {company_name} database")
+
+        conn = self._get_central_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                """
+                INSERT INTO tenants (tenant_id, company_name, email)
+                VALUES (%s, %s, %s)
+            """,
+                (tenant_id, company_name, email),
+            )
+
+            cursor.execute(
+                """
+                INSERT INTO tenants_databases (database_id, tenant_id, database_name)
+                VALUES (%s, %s, %s)
+            """,
+                (database_id, tenant_id, database_name),
+            )
+
+            conn.commit()
+        except psycopg2.IntegrityError:
+            conn.rollback()
+            raise Exception(f"Tenant with email {email} exists")
+        finally:
+            cursor.close()
+            conn.close()
