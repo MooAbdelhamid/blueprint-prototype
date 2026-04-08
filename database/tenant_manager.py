@@ -5,8 +5,9 @@ Construction
 import uuid
 
 import psycopg2
-from config import DatabaseConfig
 from psycopg2 import sql
+
+from database.config import DatabaseConfig
 
 
 class TenantDatabaseManager:
