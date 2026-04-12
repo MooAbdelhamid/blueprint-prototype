@@ -134,6 +134,7 @@ class TenantDatabaseManager:
         """
         Construction
         """
+        user_id = str(uuid.uuid4())
         tenant_id = str(uuid.uuid4())
         database_id = str(uuid.uuid4())
         database_name = f"customer_{company_name}"
@@ -160,10 +161,48 @@ class TenantDatabaseManager:
                 (database_id, tenant_id, database_name),
             )
 
+            cursor.execute(
+                """
+                INSERT INTO users (user_id, tenant_id, email, password_hash, role)
+                VALUES (%s, %s, %s, %s, %s)
+            """,
+                (user_id, tenant_id, email, "password", "Admin"),
+            )
+
             conn.commit()
         except psycopg2.IntegrityError:
             conn.rollback()
             raise Exception(f"Tenant with email {email} exists")
+        finally:
+            cursor.close()
+            conn.close()
+
+        self._create_customer_database(database_name)
+
+        # self._apply_customer_schema(database_name)
+
+        print("Tenant created successfully!")
+
+        return str(tenant_id)
+
+    def _create_customer_database(self, database_name):
+        """
+        Construction
+        """
+        conn = self._get_central_connection()
+        conn.autocommit = True
+
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                sql.SQL("CREATE DATABASE {}").format(sql.Identifier(database_name))
+            )
+        except psycopg2.errors.DuplicateDatabase:
+            print(f"Database {database_name} already exists")
+        except Exception as e:
+            print(f"Error creating database: {e}")
+            raise
         finally:
             cursor.close()
             conn.close()
