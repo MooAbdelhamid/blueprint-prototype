@@ -8,6 +8,12 @@ import psycopg2
 from psycopg2 import sql
 
 from database.config import DatabaseConfig
+from database.schemas.customers import create_customers_table
+from database.schemas.orders import create_orders_table
+from database.schemas.products import create_products_table
+from database.schemas.tenant_databases import create_tenant_databases_table
+from database.schemas.tenants import create_tenants_table
+from database.schemas.users import create_users_table
 
 
 class TenantDatabaseManager:
@@ -85,34 +91,11 @@ class TenantDatabaseManager:
 
         try:
             # Table 1: tenants
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS tenants(
-                           tenant_id UUID PRIMARY KEY,
-                           company_name VARCHAR(255) NOT NULL,
-                           email VARCHAR(255) UNIQUE NOT NULL,
-                           plan VARCHAR(255) DEFAULT 'free',
-                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP);
-                            """)
+            create_tenants_table(cursor)
             # Table 2: tenants_databases
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS tenants_databases(
-                           database_id UUID PRIMARY KEY,
-                           tenant_id UUID NOT NULL,
-                           database_name VARCHAR(100),
-                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id));
-                            """)
+            create_tenant_databases_table(cursor)
             # Table 3: users
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS users(
-                           user_id UUID PRIMARY KEY,
-                           tenant_id UUID NOT NULL,
-                           email VARCHAR(255),
-                           password_hash VARCHAR(255) NOT NULL,
-                           role VARCHAR(50) DEFAULT 'user',
-                           created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                           FOREIGN KEY (tenant_id) REFERENCES tenants(tenant_id));
-                            """)
+            create_users_table(cursor)
             conn.commit()
             print("Central database tables created!")
         except Exception as e:
@@ -179,7 +162,7 @@ class TenantDatabaseManager:
 
         self._create_customer_database(database_name)
 
-        # self._apply_customer_schema(database_name)
+        self._apply_customer_schema(database_name)
 
         print("Tenant created successfully!")
 
@@ -189,7 +172,8 @@ class TenantDatabaseManager:
         """
         Construction
         """
-        conn = self._get_central_connection()
+        conn_params = self.config.get_connection_string("postgres")
+        conn = psycopg2.connect(**conn_params)
         conn.autocommit = True
 
         cursor = conn.cursor()
@@ -202,6 +186,33 @@ class TenantDatabaseManager:
             print(f"Database {database_name} already exists")
         except Exception as e:
             print(f"Error creating database: {e}")
+            raise
+        finally:
+            cursor.close()
+            conn.close()
+
+    def _apply_customer_schema(self, database_name):
+        """
+        Construction
+        """
+        conn_params = self.config.get_connection_string(database_name)
+        conn = psycopg2.connect(**conn_params)
+
+        cursor = conn.cursor()
+
+        try:
+            create_customers_table(cursor)
+
+            create_products_table(cursor)
+
+            create_orders_table(cursor)
+
+            conn.commit()
+            print(f"Applied schema to {database_name}")
+
+        except Exception as e:
+            conn.rollback()
+            print(f"Error applying schema: {e}")
             raise
         finally:
             cursor.close()
