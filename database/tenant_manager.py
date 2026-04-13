@@ -277,3 +277,31 @@ class TenantDatabaseManager:
         finally:
             cursor.close()
             conn.close()
+
+    def list_all_tenants(self):
+        """
+        Get list of all tenants (for admin dashboard)
+
+        Returns:
+            list: List of tuples (tenant_id, company_name, email, plan, db_name)
+        """
+        conn = self._get_central_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute("""
+                SELECT 
+                    t.tenant_id,
+                    t.company_name,
+                    t.email,
+                    t.plan,
+                    td.database_name
+                FROM tenants t
+                JOIN tenant_databases td ON t.tenant_id = td.tenant_id
+                ORDER BY t.created_at DESC
+            """)
+
+            return cursor.fetchall()
+        finally:
+            cursor.close()
+            conn.close()
