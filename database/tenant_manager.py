@@ -11,8 +11,8 @@ from database.config import DatabaseConfig
 from database.schemas.customers import create_customers_table
 from database.schemas.orders import create_orders_table
 from database.schemas.products import create_products_table
-from database.schemas.tenant_databases import create_tenant_databases_table
 from database.schemas.tenants import create_tenants_table
+from database.schemas.tenants_databases import create_tenants_databases_table
 from database.schemas.users import create_users_table
 
 
@@ -93,7 +93,7 @@ class TenantDatabaseManager:
             # Table 1: tenants
             create_tenants_table(cursor)
             # Table 2: tenants_databases
-            create_tenant_databases_table(cursor)
+            create_tenants_databases_table(cursor)
             # Table 3: users
             create_users_table(cursor)
             conn.commit()
@@ -214,6 +214,66 @@ class TenantDatabaseManager:
             conn.rollback()
             print(f"Error applying schema: {e}")
             raise
+        finally:
+            cursor.close()
+            conn.close()
+
+    def get_tenant_connection(self, tenant_id):
+        """
+        Get a database connection for a specific tenant
+
+        Args:
+            tenant_id (str): UUID of the tenant
+
+        Returns:
+            psycopg2.connection: Connection to tenant's database
+        """
+
+        conn = self._get_central_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                """
+                SELECT database_name FROM tenants_databases WHERE tenant_id = %s
+                """,
+                (tenant_id,),
+            )
+            result = cursor.fetchone()
+
+            if not result:
+                raise Exception(f"Tenant {tenant_id} not found")
+
+            database_name = result[0]
+        finally:
+            cursor.close()
+            conn.close()
+
+        conn_params = self.config.get_connection_string(database_name)
+        return psycopg2.connect(**conn_params)
+
+    def get_tenant_by_email(self, email):
+        """
+        Look up tenant by their email
+
+        Args:
+            email (str): Tenant's email address
+        Returns:
+            tuple: (tenant_id, company_name) or None
+        """
+
+        conn = self._get_central_connection()
+        cursor = conn.cursor()
+
+        try:
+            cursor.execute(
+                """
+                SELECT tenant_id, company_name FROM tenants WHERE email = %s
+""",
+                (email,),
+            )
+
+            return cursor.fetchone()
         finally:
             cursor.close()
             conn.close()

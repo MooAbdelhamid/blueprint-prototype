@@ -1,4 +1,4 @@
-def create_tenant_databases_table(cursor):
+def create_tenants_databases_table(cursor):
     cursor.execute("""
                 CREATE TABLE IF NOT EXISTS tenants_databases(
                            database_id UUID PRIMARY KEY,
