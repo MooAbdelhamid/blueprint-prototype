@@ -134,7 +134,7 @@ class TenantDatabaseManager:
             create_users_table(cursor)
 
             conn.commit()
-            print("Central database tables created!")
+            print("Central database tables ready")
         except Exception as e:
             conn.rollback()
             print(f"Error creating central tables: {e}")
