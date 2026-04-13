@@ -2,7 +2,6 @@
 Database Configuration
 ======================
 This file stores connection settings for PostgreSQL server.
-
 """
 
 import os
@@ -17,11 +16,11 @@ class DatabaseConfig:
     Configuration for PostgreSQL connection
 
     Attributes:
-        HOST
-        PORT
-        USER
-        PASSWORD
-        CENTRAL_DB
+        HOST: Where PostgreSQL server is running
+        PORT: PostgreSQL default port is 5432
+        USER: Database username
+        PASSWORD: Database password
+        CENTRAL_DB: Name of the central database
     """
 
     HOST = os.getenv("DB_HOST", "localhost")
@@ -39,6 +38,9 @@ class DatabaseConfig:
 
         Args:
             database(str): Which database to connect to
+
+        Returns:
+            dict: Connection parameters
         """
 
         return {

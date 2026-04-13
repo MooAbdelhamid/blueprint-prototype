@@ -1,5 +1,18 @@
 """
-Construction
+Tenant Database Manager
+=======================
+The core of the multi-tenant system.
+
+It handles:
+1. Creating the central database if not existing
+2. Registering new tenants
+3. Creating a seperate database for each customer
+4. Connecting to the right database for each cutomer
+
+Key Definitions:
+- Tenant = A user who uses the software
+- Central Database = Main database that tracks all tenants
+- Tenant Database = Separate database for each user's data
 """
 
 import uuid
@@ -18,18 +31,30 @@ from database.schemas.users import create_users_table
 
 class TenantDatabaseManager:
     """
-    Manages multiple databases
+    Manages multiple databases for multi-tenant software
+
+    Tasks:
+    - Keeps track of all tenants
+    - Creates tenants databases
+    - Gets connection for the right database
     """
 
     def __init__(self):
         """
         Initializes the manager
+
+        Steps:
+        1. Connects to postgreSQL server
+        2. Creates central database if doesn't exist
+        3. setup central database tables from imported schemas
         """
 
         self.config = DatabaseConfig
 
+        # Make sure central database exists
         self._ensure_central_database()
 
+        # Create tables in central database if doesn't exist
         self._init_central_tables()
 
         print("Tenant database initialized")
@@ -37,6 +62,7 @@ class TenantDatabaseManager:
     def _ensure_central_database(self):
         """
         Create the central database if it doesnt exist
+
         Steps:
         1. Connect to database
         2. Check if exists
@@ -76,7 +102,7 @@ class TenantDatabaseManager:
                 print("Central database exists")
 
         except Exception as e:
-            print(e)
+            print(f"Error ensuring central database: {e}")
             raise
         finally:
             cursor.close()
@@ -85,6 +111,14 @@ class TenantDatabaseManager:
     def _init_central_tables(self):
         """
         Create tables in central database
+
+        Steps:
+        1. Create tenants, tenants_databases, users tables
+
+        Tables:
+        1. tenants
+        2. tenants_databases
+        3. users
         """
         conn = self._get_central_connection()
         cursor = conn.cursor()
@@ -92,10 +126,13 @@ class TenantDatabaseManager:
         try:
             # Table 1: tenants
             create_tenants_table(cursor)
+
             # Table 2: tenants_databases
             create_tenants_databases_table(cursor)
+
             # Table 3: users
             create_users_table(cursor)
+
             conn.commit()
             print("Central database tables created!")
         except Exception as e:
@@ -109,16 +146,33 @@ class TenantDatabaseManager:
     def _get_central_connection(self):
         """
         Get a connection to the central database
+
+        Returns:
+            psycopg2.connection: Database connection object
         """
         conn_params = self.config.get_connection_string(self.config.CENTRAL_DB)
         return psycopg2.connect(**conn_params)
 
     def create_tenant(self, company_name, email):
         """
-        Construction
+        Add a new tenant and create their database
+
+        Args:
+            company_name (str): Company name
+            email (str): Company email
+
+        Returns:
+            str: tenant_id (UUID)
+
+        Steps:
+        1. Generate unique tenant_id, user_id and database_id
+        2. Create database name
+        3. Save tenant info to central database
+        4. Create postgreSQL database
+        5. Apply schema to database
         """
-        user_id = str(uuid.uuid4())
         tenant_id = str(uuid.uuid4())
+        user_id = str(uuid.uuid4())
         database_id = str(uuid.uuid4())
         database_name = f"customer_{company_name}"
 
@@ -170,7 +224,14 @@ class TenantDatabaseManager:
 
     def _create_customer_database(self, database_name):
         """
-        Construction
+        Create a new database for the tenant
+
+        Args:
+            database_name (str): Name of the database to create
+
+        Steps:
+        1. Get connection
+        2. Create tenant database
         """
         conn_params = self.config.get_connection_string("postgres")
         conn = psycopg2.connect(**conn_params)
@@ -193,7 +254,19 @@ class TenantDatabaseManager:
 
     def _apply_customer_schema(self, database_name):
         """
-        Construction
+        Apply the imported schema to tenant's database
+
+        Args:
+            database_name (str): Database to apply schema to
+
+        Steps:
+        1. Get connection
+        2. Apply schema
+
+        Tables:
+        1. cutomers
+        2. products
+        3. orders
         """
         conn_params = self.config.get_connection_string(database_name)
         conn = psycopg2.connect(**conn_params)
@@ -269,7 +342,7 @@ class TenantDatabaseManager:
             cursor.execute(
                 """
                 SELECT tenant_id, company_name FROM tenants WHERE email = %s
-""",
+                """,
                 (email,),
             )
 
