@@ -5,7 +5,7 @@ CSV Connector - Reads data from csv file
 import logging
 from datetime import datetime
 from pathlib import Path
-from typing import Dict, List, Optional
+from typing import ClassVar, Dict, List, Optional
 
 import pandas as pd
 from base_connector import BaseConnector, ConnectionStatus, SourceType
@@ -17,6 +17,21 @@ class CSVConnector(BaseConnector):
     """
     Connector for reading data from CSV files.
     """
+
+    SCHEMAS: ClassVar[Dict] = {
+        "orders": {
+            "required": ["order_id", "customer_id"],
+            "optional": ["total", "currency"],
+        },
+        "customers": {
+            "required": ["customer_id", "email"],
+            "optional": ["name", "phone"],
+        },
+        "products": {
+            "required": ["product_id", "name"],
+            "optional": ["price", "category"],
+        },
+    }
 
     def __init__(self, source_id: str, config: Dict):
         """
@@ -122,7 +137,7 @@ class CSVConnector(BaseConnector):
         """
 
         if self.data is None:
-            logger.log(f"Reading CSV file: {self.file_path}")
+            logger.info(f"Reading CSV file: {self.file_path}")
 
             self.data = pd.read_csv(
                 self.file_path,
@@ -155,26 +170,51 @@ class CSVConnector(BaseConnector):
 
         return records
 
-    def extract_customers(self, since=None):
-        pass
+    def _extract_entity(self, entity: str) -> List[Dict]:
+        """
+        Generic extraction function
 
-    def extract_products(self, since=None):
-        pass
+        Args:
+            entity: Entity to extract from file
 
-    def extract_orders(self, since: Optional[datetime] = None) -> List[Dict]:
-        """Extract order data from CSV"""
+        Returns:
+            List of dictionaries
+        """
         try:
             df = self._read_csv()
-            logger.info(f"Extracting {len(df)} orders from CSV")
+            schema = self.SCHEMAS[entity]
 
-            orders_cols = ["order_id", "customer_id", "total"]
-            missing = [c for c in orders_cols if c not in df.columns]
+            required = schema["required"]
+            optional = schema["optional"]
+
+            missing = [c for c in required if c not in df.columns]
+
             if missing:
-                raise ValueError(f"Missing order columns: {missing}")
+                logger.warning(
+                    f"Skipping {entity}. Missing required columns: {missing}"
+                )
+                return []
 
-            df_orders = df[orders_cols]
-            return self._dataframe_to_dict_list(df_orders)
+            available_optional = [c for c in optional if c in df.columns]
+
+            selected_cols = required + available_optional
+
+            df_entity = df[selected_cols]
+
+            return self._dataframe_to_dict_list(df_entity)
 
         except Exception as e:
-            logger.error(f"Failed to extract orders: {e}")
-            raise
+            logger.error(f"Failed to extract {entity}: {e}")
+            return []
+
+    def extract_customers(self, since: Optional[datetime] = None) -> List[Dict]:
+        """Extract customers data from CSV"""
+        return self._extract_entity("customers")
+
+    def extract_products(self, since: Optional[datetime] = None) -> List[Dict]:
+        """Extract products data from CSV"""
+        return self._extract_entity("products")
+
+    def extract_orders(self, since: Optional[datetime] = None) -> List[Dict]:
+        """Extract orders data from CSV"""
+        return self._extract_entity("orders")
