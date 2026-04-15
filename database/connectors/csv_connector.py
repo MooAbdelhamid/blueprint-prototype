@@ -84,6 +84,7 @@ class CSVConnector(BaseConnector):
 
             self.status = ConnectionStatus.CONNECTED
             logger.info(f"CSV file validated: {self.file_path}")
+            return True
 
         except Exception as e:
             logger.error(f"Failed to validate CSV file: {e}")
