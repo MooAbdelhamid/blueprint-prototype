@@ -8,7 +8,12 @@ from pathlib import Path
 from typing import ClassVar, Dict, List, Optional
 
 import pandas as pd
-from base_connector import BaseConnector, ConnectionStatus, SourceType
+
+from database.connectors.base_connector import (
+    BaseConnector,
+    ConnectionStatus,
+    SourceType,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -20,15 +25,15 @@ class CSVConnector(BaseConnector):
 
     SCHEMAS: ClassVar[Dict] = {
         "orders": {
-            "required": ["order_id", "customer_id"],
-            "optional": ["total", "currency"],
+            "required": ["Order name", "Product variant SKU"],
+            "optional": ["Gross sales", "Day"],
         },
         "customers": {
             "required": ["customer_id", "email"],
             "optional": ["name", "phone"],
         },
         "products": {
-            "required": ["product_id", "name"],
+            "required": ["Product title", "Product variant SKU"],
             "optional": ["price", "category"],
         },
     }
@@ -38,7 +43,7 @@ class CSVConnector(BaseConnector):
         Initialize CSV connector.
 
         Args:
-            ource_id: Unique ID for this data source
+            source_id: Unique ID for this data source
             config: Configuration dictionary with keys:
                 - file_path: Path to the CSV file
                 - delimiter: CSV delimiter (default: ',')
