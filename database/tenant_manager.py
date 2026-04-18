@@ -48,6 +48,7 @@ class TenantDatabaseManager:
         2. Creates central database if doesn't exist
         3. setup central database tables from imported schemas
         """
+        self._tenant_db_cache = {}
 
         self.config = DatabaseConfig
 
@@ -153,13 +154,12 @@ class TenantDatabaseManager:
         conn_params = self.config.get_connection_string(self.config.CENTRAL_DB)
         return psycopg2.connect(**conn_params)
 
-    def create_tenant(self, company_name, email):
+    def create_tenant(self, company_name):
         """
         Add a new tenant and create their database
 
         Args:
             company_name (str): Company name
-            email (str): Company email
 
         Returns:
             str: tenant_id (UUID)
@@ -172,9 +172,8 @@ class TenantDatabaseManager:
         5. Apply schema to database
         """
         tenant_id = str(uuid.uuid4())
-        user_id = str(uuid.uuid4())
         database_id = str(uuid.uuid4())
-        database_name = f"customer_{company_name}"
+        database_name = f"tenant_{tenant_id.replace('-', '')}"
 
         print(f"Creating customer {company_name} database")
 
@@ -184,10 +183,10 @@ class TenantDatabaseManager:
         try:
             cursor.execute(
                 """
-                INSERT INTO tenants (tenant_id, company_name, email)
-                VALUES (%s, %s, %s)
+                INSERT INTO tenants (tenant_id, company_name)
+                VALUES (%s, %s)
             """,
-                (tenant_id, company_name, email),
+                (tenant_id, company_name),
             )
 
             cursor.execute(
@@ -198,29 +197,48 @@ class TenantDatabaseManager:
                 (database_id, tenant_id, database_name),
             )
 
+            self._create_customer_database(database_name)
+
+            self._apply_customer_schema(database_name)
+
+            conn.commit()
+        except psycopg2.IntegrityError:
+            conn.rollback()
+            raise Exception(f"Tenant with company_name {company_name} exists")
+        finally:
+            cursor.close()
+            conn.close()
+
+        print("Tenant created successfully!")
+
+        return str(tenant_id)
+
+    def create_user(self, tenant_id, email, password_hash, role="user"):
+        user_id = str(uuid.uuid4())
+
+        conn = self._get_central_connection()
+        cursor = conn.cursor()
+
+        try:
             cursor.execute(
                 """
                 INSERT INTO users (user_id, tenant_id, email, password_hash, role)
                 VALUES (%s, %s, %s, %s, %s)
             """,
-                (user_id, tenant_id, email, "password", "Admin"),
+                (user_id, tenant_id, email, password_hash, role),
             )
 
             conn.commit()
+
         except psycopg2.IntegrityError:
             conn.rollback()
             raise Exception(f"Tenant with email {email} exists")
+
         finally:
             cursor.close()
             conn.close()
 
-        self._create_customer_database(database_name)
-
-        self._apply_customer_schema(database_name)
-
-        print("Tenant created successfully!")
-
-        return str(tenant_id)
+        return user_id
 
     def _create_customer_database(self, database_name):
         """
@@ -281,6 +299,7 @@ class TenantDatabaseManager:
             create_orders_table(cursor)
 
             conn.commit()
+
             print(f"Applied schema to {database_name}")
 
         except Exception as e:
@@ -341,7 +360,10 @@ class TenantDatabaseManager:
         try:
             cursor.execute(
                 """
-                SELECT tenant_id, company_name FROM tenants WHERE email = %s
+                SELECT t.tenant_id, t.company_name
+                FROM tenants t
+                JOIN users u ON t.tenant_id = u.tenant_id
+                WHERE u.email = %s
                 """,
                 (email,),
             )
@@ -366,11 +388,12 @@ class TenantDatabaseManager:
                 SELECT 
                     t.tenant_id,
                     t.company_name,
-                    t.email,
+                    u.email,
                     t.plan,
                     td.database_name
                 FROM tenants t
-                JOIN tenant_databases td ON t.tenant_id = td.tenant_id
+                JOIN tenants_databases td ON t.tenant_id = td.tenant_id
+                LEFT JOIN users u ON t.tenant_id = u.tenant_id
                 ORDER BY t.created_at DESC
             """)
 
