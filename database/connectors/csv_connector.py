@@ -2,7 +2,6 @@
 CSV Connector - Reads data from csv file
 """
 
-import logging
 from datetime import datetime
 from pathlib import Path
 from typing import ClassVar, Dict, List, Optional
@@ -14,8 +13,6 @@ from database.connectors.base_connector import (
     ConnectionStatus,
     SourceType,
 )
-
-logger = logging.getLogger(__name__)
 
 
 class CSVConnector(BaseConnector):
@@ -71,12 +68,10 @@ class CSVConnector(BaseConnector):
         """
         try:
             if not self.file_path.exists():
-                logger.error(f"CSV file not found: {self.file_path}")
                 self.status = ConnectionStatus.FAILED
                 return False
 
             if not self.file_path.is_file():
-                logger.error(f"Path is not a file: {self.file_path}")
                 self.status = ConnectionStatus.FAILED
                 return False
 
@@ -88,11 +83,10 @@ class CSVConnector(BaseConnector):
             )
 
             self.status = ConnectionStatus.CONNECTED
-            logger.info(f"CSV file validated: {self.file_path}")
+
             return True
 
-        except Exception as e:
-            logger.error(f"Failed to validate CSV file: {e}")
+        except Exception:
             self.status = ConnectionStatus.FAILED
             return False
 
@@ -143,8 +137,6 @@ class CSVConnector(BaseConnector):
         """
 
         if self.data is None:
-            logger.info(f"Reading CSV file: {self.file_path}")
-
             self.data = pd.read_csv(
                 self.file_path,
                 delimiter=self.delimiter,
@@ -154,9 +146,6 @@ class CSVConnector(BaseConnector):
             )
 
             self._row_count = len(self.data)
-            logger.info(
-                f"CSV loaded: {self._row_count} rows, {len(self.data.columns)} columns"
-            )
 
         return self.data
 
@@ -196,9 +185,6 @@ class CSVConnector(BaseConnector):
             missing = [c for c in required if c not in df.columns]
 
             if missing:
-                logger.warning(
-                    f"Skipping {entity}. Missing required columns: {missing}"
-                )
                 return []
 
             available_optional = [c for c in optional if c in df.columns]
@@ -209,8 +195,7 @@ class CSVConnector(BaseConnector):
 
             return self._dataframe_to_dict_list(df_entity)
 
-        except Exception as e:
-            logger.error(f"Failed to extract {entity}: {e}")
+        except Exception:
             return []
 
     def extract_customers(self, since: Optional[datetime] = None) -> List[Dict]:

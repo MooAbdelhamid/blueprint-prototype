@@ -30,21 +30,11 @@ class BaseTransformer(ABC):
         return records
 
     @abstractmethod
-    def __normalize_columns(self, records: List[Dict]) -> List[Dict]:
-        """Rename columns to a consistent format"""
-        pass
-
-    @abstractmethod
     def __clean(self, records: List[Dict]) -> List[Dict]:
         """Handle nulls, types, trimming, etc."""
         pass
 
     @abstractmethod
     def _map_schema(self, records: List[Dict]) -> List[Dict]:
-        """Map source fields to internal schema"""
-        pass
-
-    @abstractmethod
-    def _add_metadata(self, records: List[Dict]) -> List[Dict]:
         """Map source fields to internal schema"""
         pass
