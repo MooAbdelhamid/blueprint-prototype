@@ -21,12 +21,12 @@ import psycopg2
 from psycopg2 import sql
 
 from database.config import DatabaseConfig
-from database.schemas.customers import create_customers_table
-from database.schemas.orders import create_orders_table
-from database.schemas.products import create_products_table
-from database.schemas.tenants import create_tenants_table
-from database.schemas.tenants_databases import create_tenants_databases_table
-from database.schemas.users import create_users_table
+from database.schemas.central.tenants import create_tenants_table
+from database.schemas.central.tenants_databases import create_tenants_databases_table
+from database.schemas.central.users import create_users_table
+from database.schemas.tenant.customers import create_customers_table
+from database.schemas.tenant.orders import create_orders_table
+from database.schemas.tenant.products import create_products_table
 
 
 class TenantDatabaseManager:
