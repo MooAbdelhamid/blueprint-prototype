@@ -1,0 +1,40 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="Page-1" id="klDRQW4Kb_cem-WAjtSe">
+    <mxGraphModel dx="1030" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="User&lt;div&gt;Interface&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="360" y="40" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="API&lt;div&gt;Client&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="360" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="FastAPI&lt;div&gt;Entry Point&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="360" y="200" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Auth Module&lt;div&gt;Login / Register&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="240" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Ingestion Modules" vertex="1">
+          <mxGeometry height="40" width="120" x="480" y="280" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Orchestrator&amp;nbsp;" vertex="1">
+          <mxGeometry height="40" width="120" x="360" y="360" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Users Manager" vertex="1">
+          <mxGeometry height="40" width="120" x="240" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Users Database" vertex="1">
+          <mxGeometry height="40" width="120" x="240" y="520" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Tenants DB Manager" vertex="1">
+          <mxGeometry height="40" width="120" x="480" y="440" as="geometry" />
+        </mxCell>
+        <mxCell id="c_PtiKYLA_AhPJzD8fpV-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Tenants Database" vertex="1">
+          <mxGeometry height="40" width="120" x="480" y="520" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
