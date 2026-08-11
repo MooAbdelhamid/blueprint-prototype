@@ -5,20 +5,16 @@ The core of the multi-tenant system.
 """
 
 import psycopg2
-from config import DatabaseConfig
 from psycopg2 import sql
 from psycopg2.extras import execute_values
-from schemas.tenant.orders import create_orders_table
+
+from database.config import DatabaseConfig
+from database.schemas.tenant.orders import create_orders_table
 
 
 class TenantDatabaseManager:
     """
     Manages multiple databases for multi-tenant software
-
-    Tasks:
-    - Keeps track of all tenants
-    - Creates tenants databases
-    - Gets connection for the right database
     """
 
     def __init__(self):
@@ -33,9 +29,6 @@ class TenantDatabaseManager:
     def _get_central_connection(self):
         """
         Get a connection to the central database
-
-        Returns:
-            psycopg2.connection: Database connection object
         """
         conn_params = self.config.get_connection_string(self.config.CENTRAL_DB)
         return psycopg2.connect(**conn_params)
@@ -100,7 +93,8 @@ class TenantDatabaseManager:
         INSERT INTO {table}
         (order_id, order_date, total_value)
         VALUES %s
-    """).format(table=sql.Identifier("orders"))
+        """).format(table=sql.Identifier("orders"))
+
         with conn.cursor() as cur:
             execute_values(cur, query, orders)
 

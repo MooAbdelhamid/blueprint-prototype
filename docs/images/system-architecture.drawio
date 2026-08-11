@@ -1,38 +1,54 @@
-<mxfile host="app.diagrams.net">
-  <diagram name="Page-1" id="klDRQW4Kb_cem-WAjtSe">
+<mxfile host="app.diagrams.net" pages="3">
+  <diagram name="Page-1" id="z-Uwd7mrQibzd1B2LetN">
     <mxGraphModel dx="1030" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="User&lt;div&gt;Interface&lt;/div&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="360" y="40" as="geometry" />
+        <mxCell id="INqyjtPwJHryBpWkrX7w-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Orchestrator" vertex="1">
+          <mxGeometry height="40" width="280" x="200" y="280" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="API&lt;div&gt;Client&lt;/div&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="360" y="120" as="geometry" />
+        <mxCell id="INqyjtPwJHryBpWkrX7w-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Business&lt;div&gt;Manager&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="120" x="360" y="440" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="FastAPI&lt;div&gt;Entry Point&lt;/div&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="360" y="200" as="geometry" />
+        <mxCell id="INqyjtPwJHryBpWkrX7w-3" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="ETL&lt;div&gt;Pipeline&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="50" x="360" y="360" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-5" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Auth Module&lt;div&gt;Login / Register&lt;/div&gt;" vertex="1">
-          <mxGeometry height="40" width="120" x="240" y="280" as="geometry" />
+        <mxCell id="INqyjtPwJHryBpWkrX7w-4" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="User Interface" vertex="1">
+          <mxGeometry height="40" width="120" x="280" y="200" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-6" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Ingestion Modules" vertex="1">
-          <mxGeometry height="40" width="120" x="480" y="280" as="geometry" />
+        <mxCell id="UqVK6alBv0-EyvFbcmFv-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Users Manager" vertex="1">
+          <mxGeometry height="40" width="120" x="200" y="440" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-7" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Orchestrator&amp;nbsp;" vertex="1">
-          <mxGeometry height="40" width="120" x="360" y="360" as="geometry" />
+        <mxCell id="UqVK6alBv0-EyvFbcmFv-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Query&lt;div&gt;Pipeline&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="50" x="430" y="360" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-8" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Users Manager" vertex="1">
-          <mxGeometry height="40" width="120" x="240" y="440" as="geometry" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="KUwaF9mg5Mrq6PAd9LUD" name="Page-2">
+    <mxGraphModel dx="1030" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="CR0B5GbrRkv6KRmxDHj7-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Business&lt;div&gt;Manager&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="240" x="40" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-9" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Users Database" vertex="1">
-          <mxGeometry height="40" width="120" x="240" y="520" as="geometry" />
+        <mxCell id="CR0B5GbrRkv6KRmxDHj7-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="&lt;ul&gt;&lt;li&gt;Creates main DB&lt;/li&gt;&lt;li&gt;Creates tables&lt;/li&gt;&lt;li&gt;Inserts each table&lt;/li&gt;&lt;li&gt;Run queries to DB Table&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="120" width="240" x="40" y="80" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-10" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Tenants DB Manager" vertex="1">
-          <mxGeometry height="40" width="120" x="480" y="440" as="geometry" />
+      </root>
+    </mxGraphModel>
+  </diagram>
+  <diagram id="rMHLEGwT34fTEFnhHss7" name="Page-3">
+    <mxGraphModel dx="1030" dy="567" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="PlXtpl2W15LDC1z1X8Uc-1" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Business&lt;div&gt;Manager&lt;/div&gt;" vertex="1">
+          <mxGeometry height="40" width="240" x="80" y="40" as="geometry" />
         </mxCell>
-        <mxCell id="c_PtiKYLA_AhPJzD8fpV-11" parent="1" style="rounded=0;whiteSpace=wrap;html=1;" value="Tenants Database" vertex="1">
-          <mxGeometry height="40" width="120" x="480" y="520" as="geometry" />
+        <mxCell id="PlXtpl2W15LDC1z1X8Uc-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;align=left;" value="&lt;ul&gt;&lt;li&gt;Creates main DB&lt;/li&gt;&lt;li&gt;Creates tables&lt;/li&gt;&lt;li&gt;Inserts each table&lt;/li&gt;&lt;li&gt;Run queries to DB Table&lt;/li&gt;&lt;/ul&gt;" vertex="1">
+          <mxGeometry height="120" width="240" x="80" y="80" as="geometry" />
         </mxCell>
       </root>
     </mxGraphModel>
